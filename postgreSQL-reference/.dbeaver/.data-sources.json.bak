@@ -1,7 +1,7 @@
 {
 	"folders": {},
 	"connections": {
-		"postgres-jdbc-199d62c7952-4bb84d570a349dd": {
+		"postgres-jdbc-199cde8156b-65f1f2e31ccd1059": {
 			"provider": "postgresql",
 			"driver": "postgres-jdbc",
 			"name": "postgres",
@@ -15,7 +15,7 @@
 				"type": "dev",
 				"closeIdleConnection": true,
 				"provider-properties": {
-					"@dbeaver-show-non-default-db@": "true"
+					"@dbeaver-show-non-default-db@": "false"
 				},
 				"auth-model": "native"
 			}
