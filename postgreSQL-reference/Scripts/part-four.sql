@@ -157,5 +157,62 @@ group by drivers.driverid;
 select * from results;
 select * from drivers;
 
+select races.date,
+races.name,
+drivers.surname as pole_position,
+results.position
+from races
+/*
+* We want only the pole position from the races
+* know the result of and still list the race when
+* we don't know the results.
+*/
+left join results
+on races.raceid = results.raceid
+and results.grid = 1
+left join drivers using(driverid)
+where
+ date >= '2017-05-01'
+and date < '2017-08-01'
+order by races.date;
+
+--erroneous t=null
+select 't'=null;
+select true=true;
+select false=true;
+
+-- What happens in the background is
+--that PostgreSQL created a type with the same name that you can manipulate, or
+--reference. So the select statement here is returning tuples of the composite type
+--races.
+select races from races;
+
+--In this example query, we can also see that we are using the same relation twice(self join)
+--in the same FROM query, thus giving the relation different aliases.
+--The association is specified precisely in the join condition and is
+--usually based on some equality operator, but it is not limited to that.
+select results.positionorder as position,
+drivers.code,
+count(behind.*) as behind
+from results
+join drivers using(driverid)
+left join results behind
+on results.raceid = behind.raceid
+and results.positionorder < behind.positionorder
+where results.raceid = 972
+and results.positionorder <= 3
+group by results.positionorder, drivers.code
+order by results.positionorder;
+
+
+--Gives null
+select 18<null;
+--Gives 0
+select count(null);
+--Gives 1
+select count(*);
+--Gives 2
+SELECT CASE WHEN NULL <> 'test' THEN 1 ELSE 2 END;
+
 
 
