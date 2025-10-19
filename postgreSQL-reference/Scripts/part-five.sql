@@ -53,16 +53,12 @@ having bool_and(position is not distinct from 1) is true
 order by year, points desc;
 
 --returns false when result is null
---The BOOL_AND() function returns true if all values in the group are true, or false otherwise.
+--The BOOL_AND() function returns true if all values in the group are true, or false otherwise. Returns null if all positions are null
 select bool_and( position=1000) from results;
 
-select * from results where position is null;
-select * from results where position =1;
-select * from results where position is not distinct from 1;
 
 create table boolandtests(id int primary key generated always  as identity,name text not null, position int, county int, group_id int not null);
 
-alter table boolandtests add column group_id int not null;
 
 insert into boolandtests (name, position, county, group_id) values
 ('Alice', 1, 10, 1),
@@ -81,17 +77,27 @@ insert into boolandtests (name, position, county, group_id) values
 ('Nina', 1, 50, 1),
 ('Oscar', null, null, 2);
 
+--in bool_and():
+--{true,true,null}=true, ignores null and considers other values as normal
+--{TRUE, FALSE, NULL}=false, if any one is false then it is false
+--{null,null,null}=null, if all null then null
 select count(*) from boolandtests group by group_id
-having bool_and(position=1);
+having bool_and(position=1) is true;
 
+--here, no null value is there. null value becomes false here
+--{true,true,null} becomes {true,true,false}=false,
+--{TRUE, FALSE, NULL}={TRUE, FALSE, false}=false,
+--{null,null,null}={false,false,false}=false,
 select count(*) from boolandtests group by group_id
-having bool_and(position is not distinct from 1);
+having bool_and(position is not distinct from 1) is true;
 
+--Multiple updates with many statements;
 update boolandtests set county=110 where id=1;
 update boolandtests set county=115 where id=3;
 update boolandtests set county=140 where id=11;
 update boolandtests set county=150 where id=14;
 
+--Single update statement
 UPDATE boolandtests
 SET county = CASE id
     WHEN 1 THEN 110
@@ -101,13 +107,37 @@ SET county = CASE id
 END
 WHERE id IN (1, 3, 11, 14);
 
-update boolandtests bt set bt.county=dummy.county from (values (1,110),(3,115),(11,140),(14,150)) as dummy(id,county) where dummy.id=bt.id;
-
+--Single update Statement
 update boolandtests bt set county=dummy.county from (values (1,110),(3,115),(11,140),(14,150)) as dummy(id,county) where dummy.id=bt.id;
 
-select count(*) from boolandtests group by group_id having max(county)>100; 
+--These both are same as having only look for true values and filters out null value, no need for "is true"
+select array_agg(county) from boolandtests group by group_id having max(county)>100; 
+select count(*) from boolandtests group by group_id having max(county)>100 is true; 
+
+--max(all null position) is null
+select count(*) from boolandtests group by group_id having max(position) is null;
+--max(All null position)>100000 is null
+select count(*) from boolandtests group by group_id having max(position)>100000 is null;
 
 select * from boolandtests;
+
+--Gives null
+select max(null);
+--Gives null
+select null>100;
+
+--Gives 0
+select count(null);
+--count * will also count null column as 1, this gives 1
+select count(*);
+
+--Count(*) will not ignore null and count it as 1
+select count(*) from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,money);
+--These two queries produce same result. Count(column_name) count null as 0
+select count(money) from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,money);
+select count(*) filter(where salary.money is not null) from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,money);
+
+
 
 
 
