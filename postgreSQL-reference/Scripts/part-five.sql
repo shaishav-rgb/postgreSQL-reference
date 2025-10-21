@@ -184,5 +184,13 @@ as uuid_string_bytes;
 select pg_column_size(timestamp without time zone 'now'),
 pg_column_size(timestamp with time zone 'now');
 
+--function calculation result alias
+select extract(year from ats) as year,
+count(*) filter(where project = 'postgresql') as postgresql,
+count(*) filter(where project = 'pgloader') as pgloader
+from commitlog
+group by year
+order by year;
+
 
 
