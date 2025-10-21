@@ -137,8 +137,52 @@ select count(*) from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,mo
 select count(money) from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,money);
 select count(*) filter(where salary.money is not null) from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,money);
 
+select count(*) filter(where salary.money >0)  from (values (1,null),(3,115),(11,140),(14,150)) as salary(id,money);
 
+--text processing
+with categories(id, categories) as
+(
+select id,
+regexp_split_to_array(
+regexp_split_to_table(themes, ','),
+' > ')
+as categories
+from opendata.archives_planete
+)
+select id,
+categories[1] as category,
+categories[2] as subcategory
+from categories
+where id = 'IF39599';
 
+--code, forename, surname are functionally dependent on driverid
+--PostgreSQL accepts this because the extra columns are uniquely determined.
+--You’ll see only one code and one name per driver.
+select year,
+drivers.code,
+format('%s %s', forename, surname) as name,
+count(*)
+from results
+join races using(raceid)
+join drivers using(driverid)
+where grid = 1
+and position = 1
+group by year, drivers.driverid
+order by count desc
+limit 10;
+
+create extension "uuid-ossp";
+
+select uuid_generate_v4()
+from generate_series(1, 10) as t(x);
+
+select pg_column_size(uuid 'fbb850cc-dd26-4904-96ef-15ad8dfaff07')
+as uuid_bytes,
+pg_column_size('fbb850cc-dd26-4904-96ef-15ad8dfaff07')
+as uuid_string_bytes;
+
+select pg_column_size(timestamp without time zone 'now'),
+pg_column_size(timestamp with time zone 'now');
 
 
 
