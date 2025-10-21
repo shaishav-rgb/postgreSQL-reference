@@ -192,5 +192,31 @@ from commitlog
 group by year
 order by year;
 
+create table hashtag (
+  id serial primary key,
+  hashtags text[]
+);
+
+insert into hashtag (hashtags) values
+  (array['fun','summer','travel']),
+  (array['fun','food']),
+  (array['travel','adventure','fun']),
+  (array['coding','tech','fun']),
+  (array['music','party','fun']),
+  (array['summer','beach','travel']),
+  (array['adventure','mountains']),
+  (array['food','cooking','fun']),
+  (array['travel','photography']),
+  (array['tech','ai','coding']);
+
+select * from hashtag;
+
+
+select tag, count(*)
+from hashtag, unnest(hashtags) as t(tag)
+group by tag
+order by count desc
+limit 10;
+
 
 
