@@ -120,3 +120,11 @@ on true -- required with a lateral join
 order by category.name, article.pubdate desc;
 
 
+
+
+
+
+
+
+
+
