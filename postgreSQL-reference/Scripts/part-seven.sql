@@ -117,3 +117,23 @@ commit;
 
 
 rollback;
+
+
+--Row Constructor Comparison
+SELECT (1,2,null) < (1,3,0);
+
+select (1,2,0) >= (1,2,null);
+
+select (1,3,0) >= (1,2,null);
+select (1,2,0) >= (1,2,0);
+select (1,null,0) >= (1,2,0);
+
+select (1,3,null) = (1,2,0);
+select (1,2,0) = (1,2,0);
+
+select (1,null,0) <> (1,2,0);
+select (1,2,null) <> (1,2,0);
+select (1,3,null) <> (1,2,0);
+select (1,2,0) <> (1,2,0);
+select (null,2,0) <> (1,2,0);
+
