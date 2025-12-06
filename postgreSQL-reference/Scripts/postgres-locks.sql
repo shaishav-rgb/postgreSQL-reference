@@ -120,12 +120,22 @@ select * from dummytags where id=3 for no key update;
 
 --in this mean time, if some transaction update id=3 then below queries will immediately throw 40001 error
 update dummytags set tag='rhino' where id=1;
+update dummytags set tag='moa moa' where id=6;
+
+--test
+select * from dummytags where id=1 and metatags='sahara';
 commit;
 
 
 #SERIALIZABLE#
 
---1.)
+--1.)Any update or insert in unrelated row when transaction is ongoing will cause a serialization error, read will not cause serialization error, update or 
+--insert need to happen
+
+--	ERROR:  could not serialize access due to read/write dependencies among transactions
+--DETAIL:  Reason code: Canceled on identification as a pivot, during conflict out checking.
+--HINT:  The transaction might succeed if retried.
+
 	
 
 	
