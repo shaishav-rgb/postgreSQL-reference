@@ -129,8 +129,12 @@ commit;
 
 #SERIALIZABLE#
 
---1.)Any update or insert in unrelated row when transaction is ongoing will cause a serialization error, read will not cause serialization error, update or 
---insert need to happen
+--1.)Any update-update in unrelated row of same table when transaction is ongoing will cause a serialization error, read will not cause serialization error, 
+--update  needs to happen. Error in insert-insert(error when read is performed in both sides) or update-insert(error when read is performed in 
+--either one side) in same table.
+
+--2.) Two table can have serialization error when update-update is done with read of both tables, when no read is done to either table, then update-update of 
+--	cross table is possible without serialization error
 
 --	ERROR:  could not serialize access due to read/write dependencies among transactions
 --DETAIL:  Reason code: Canceled on identification as a pivot, during conflict out checking.
